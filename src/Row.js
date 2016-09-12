@@ -201,8 +201,9 @@ const Row = React.createClass({
     };
 
     let cells = this.getCells();
+    // @NOTE: Lennd: Add attribute for row idx
     return (
-      <div {...this.props} className={className} style={style} onDragEnter={this.handleDragEnter}>
+      <div {...this.props} className={className} style={style} onDragEnter={this.handleDragEnter} data-row={this.props.idx}>
         {React.isValidElement(this.props.row) ?
           this.props.row : cells}
       </div>

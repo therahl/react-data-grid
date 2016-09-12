@@ -123,11 +123,33 @@ const ReactDataGrid = React.createClass({
     let columnMetrics = this.createColumnMetrics();
     let initialState = {columnMetrics, selectedRows: [], copied: null, expandedRows: [], canFilter: false, columnFilters: {}, sortDirection: null, sortColumn: null, dragged: null, scrollOffset: 0, lastRowIdxUiSelected: -1};
     if (this.props.enableCellSelect) {
-      initialState.selected = {rowIdx: 0, idx: 0};
+      // @NOTE Lennd: If endableCellSelect, start with cells deselected
+      initialState.selected = {rowIdx: -1, idx: -1};
     } else {
       initialState.selected = {rowIdx: -1, idx: -1};
     }
     return initialState;
+  },
+
+  // @NOTE: Lennd: Ability to deselect all cells
+  deselectCells: function() {
+    this.setState({ selected: { rowIdx: -1, idx: -1 } });
+  },
+
+  // @NOTE: Lennd: Ability to deselect specific rows with an array of row ids
+  deselectRows: function(rowsToDeselect) {
+    let selectedRows = [];
+    for (let i = 0; i < this.state.selectedRows; i++) {
+      if (rowsToDeselect.indexOf(this.state.selectedRows[i].id) === -1) {
+        selectedRows.push(this.state.selectedRows[i]);
+      } else {
+        selectedRows.push(Object.assign({}, this.state.selectedRows[i], { isSelected: false }));
+      }
+    }
+    this.setState({ selectedRows: selectedRows });
+    if (typeof this.props.onRowSelect === 'function') {
+      this.props.onRowSelect(selectedRows.filter(r => r.isSelected === true));
+    }
   },
 
   hasSelectedCellChanged: function(selected: SelectedType) {
@@ -238,6 +260,11 @@ const ReactDataGrid = React.createClass({
 
   onPressEscape(e: SyntheticKeyboardEvent) {
     this.setInactive(e.key);
+
+    // @NOTE Lennd: Clear copied state if escape is pressed
+    if (this.state.copied) {
+      this.setState({ copied: null });
+    }
   },
 
   onPressBackspace(e: SyntheticKeyboardEvent) {
@@ -402,7 +429,8 @@ const ReactDataGrid = React.createClass({
   },
 
   handlePaste() {
-    if (!this.copyPasteEnabled()) { return; }
+    // @NOTE Lennd: Return if there is no copied state
+    if (!this.copyPasteEnabled() || !this.state.copied) { return; }
     let selected = this.state.selected;
     let cellKey = this.getColumn(this.state.selected.idx).key;
     let textToCopy = this.state.textToCopy;
