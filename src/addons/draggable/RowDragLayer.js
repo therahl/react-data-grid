@@ -55,6 +55,7 @@ class CustomDragLayer extends Component {
   }
 
   renderDraggedRows() {
+    // @NOTE Lennd: pass columns to renderDraggedCells
     const columns = this.props.columns;
     return this.getDraggedRows().map((r, i) => {
       return <tr key={`dragged-row-${i}`}>{this.renderDraggedCells(r, i, columns) }</tr>;
@@ -64,6 +65,7 @@ class CustomDragLayer extends Component {
   renderDraggedCells(item, rowIdx, columns) {
     let cells = [];
     if (item != null) {
+      // @NOTE Lennd: Iterate over columns and use formatter when available
       columns.forEach( c => {
         if (item.hasOwnProperty(c.key)) {
           if (c.formatter) {
