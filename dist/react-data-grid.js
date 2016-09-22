@@ -1252,7 +1252,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }),
 	      this.props.rowsCount >= 1 || this.props.rowsCount === 0 && !this.props.emptyRowsView ? React.createElement(
 	        'div',
-	        { ref: 'viewPortContainer', tabIndex: '0', onKeyDown: this.props.onViewportKeydown, onKeyUp: this.props.onViewportKeyup, onDoubleClick: this.props.onViewportDoubleClick, onDragStart: this.props.onViewportDragStart, onDragEnd: this.props.onViewportDragEnd },
+	        { ref: 'viewPortContainer', tabIndex: '0', onKeyDown: this.props.onViewportKeydown, onKeyUp: this.props.onViewportKeyup, onDoubleClick: this.props.onViewportDoubleClick },
 	        React.createElement(Viewport, {
 	          ref: 'viewport',
 	          rowKey: this.props.rowKey,
@@ -1266,6 +1266,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          columnMetrics: this.props.columnMetrics,
 	          totalWidth: this.props.totalWidth,
 	          onScroll: this.onScroll,
+	          handleDragEnd: this.props.onViewportDragEnd,
+	          handleDragStart: this.props.onViewportDragStart,
 	          onRows: this.props.onRows,
 	          cellMetaData: this.props.cellMetaData,
 	          rowOffsetHeight: this.props.rowOffsetHeight || this.props.rowHeight * headerRows.length,
@@ -2461,7 +2463,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    rowScrollTimeout: PropTypes.number,
 	    contextMenu: PropTypes.element,
 	    getSubRowDetails: PropTypes.func,
-	    rowGroupRenderer: PropTypes.func
+	    rowGroupRenderer: PropTypes.func,
+	    handleDragEnd: PropTypes.func.isRequired,
+	    handleDragStart: PropTypes.func.isRequired
 	  },
 
 	  onScroll: function onScroll(scroll) {
@@ -2514,7 +2518,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        contextMenu: this.props.contextMenu,
 	        rowSelection: this.props.rowSelection,
 	        getSubRowDetails: this.props.getSubRowDetails,
-	        rowGroupRenderer: this.props.rowGroupRenderer
+	        rowGroupRenderer: this.props.rowGroupRenderer,
+	        handleDragStart: this.props.handleDragStart,
+	        handleDragEnd: this.props.handleDragEnd
 	      })
 	    );
 	  }
@@ -2591,7 +2597,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        rowKey: React.PropTypes.string.isRequired
 	      }).isRequired
 	    })]),
-	    rowGroupRenderer: React.PropTypes.func
+	    rowGroupRenderer: React.PropTypes.func,
+	    handleDragStart: React.PropTypes.func.isRequired,
+	    handleDragEnd: React.PropTypes.func.isRequired
 	  },
 
 	  getDefaultProps: function getDefaultProps() {
@@ -2789,7 +2797,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  renderRow: function renderRow(props) {
 	    var row = props.row;
 	    if (row.__metaData && row.__metaData.isGroup) {
-	      return React.createElement(_RowGroup2['default'], _extends({ name: row.name }, row.__metaData, { row: props.row, idx: props.idx, cellMetaData: this.props.cellMetaData, renderer: this.props.rowGroupRenderer }));
+	      return React.createElement(_RowGroup2['default'], _extends({ name: row.name }, row.__metaData, { row: props.row, idx: props.idx, handleDragEnd: props.handleDragEnd, handleDragStart: props.handleDragStart, cellMetaData: this.props.cellMetaData, renderer: this.props.rowGroupRenderer }));
 	    }
 	    if (this.state.scrollingTimeout !== null) {
 	      // in the midst of a rapid scroll, so we render placeholders
@@ -2851,6 +2859,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: displayStart + idx,
 	        ref: idx,
 	        idx: displayStart + idx,
+	        handleDragStart: _this4.props.handleDragStart,
+	        handleDragEnd: _this4.props.handleDragEnd,
 	        row: r.row,
 	        height: rowHeight,
 	        onMouseOver: _this4.onMouseOver,
@@ -3257,7 +3267,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    extraClasses: PropTypes.string,
 	    forceUpdate: PropTypes.bool,
 	    subRowDetails: PropTypes.object,
-	    isRowHovered: PropTypes.bool
+	    isRowHovered: PropTypes.bool,
+	    handleDragEnd: PropTypes.func.isRequired,
+	    handleDragStart: PropTypes.func.isRequired
 	  },
 
 	  mixins: [ColumnUtilsMixin],
@@ -3307,6 +3319,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          ref: i,
 	          key: column.key + '-' + i,
 	          idx: i,
+	          handleDragEnd: _this.props.handleDragEnd,
+	          handleDragStart: _this.props.handleDragStart,
 	          rowIdx: _this.props.idx,
 	          value: _this.getCellValue(column.key || i),
 	          column: column,
@@ -3463,6 +3477,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    isRowSelected: React.PropTypes.bool,
 	    cellMetaData: React.PropTypes.shape(CellMetaDataShape).isRequired,
 	    handleDragStart: React.PropTypes.func,
+	    handleDragEnd: React.PropTypes.func,
 	    className: React.PropTypes.string,
 	    cellControls: React.PropTypes.any,
 	    rowData: React.PropTypes.object.isRequired,
@@ -3843,7 +3858,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var dragHandle = !this.isActive() && ColumnUtils.canEdit(this.props.column, this.props.rowData, this.props.cellMetaData.enableCellSelect) ? React.createElement(
 	      'div',
-	      { className: 'drag-handle', draggable: 'true', onDoubleClick: this.onDragHandleDoubleClick },
+	      { className: 'drag-handle', draggable: 'true', onDragStart: this.props.handleDragStart, onDragEnd: this.props.handleDragEnd, onDoubleClick: this.onDragHandleDoubleClick },
 	      React.createElement('span', { style: { display: 'none' } })
 	    ) : null;
 	    var events = this.getEvents();

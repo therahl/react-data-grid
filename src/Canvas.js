@@ -52,7 +52,9 @@ const Canvas = React.createClass({
         }).isRequired
       })
     ]),
-    rowGroupRenderer: React.PropTypes.func
+    rowGroupRenderer: React.PropTypes.func,
+    handleDragStart: React.PropTypes.func.isRequired,
+    handleDragEnd: React.PropTypes.func.isRequired
   },
 
   getDefaultProps() {
@@ -260,7 +262,7 @@ const Canvas = React.createClass({
   renderRow(props: any) {
     let row = props.row;
     if (row.__metaData && row.__metaData.isGroup) {
-      return <RowGroup name={row.name} {...row.__metaData} row={props.row} idx={props.idx} cellMetaData={this.props.cellMetaData} renderer={this.props.rowGroupRenderer}/>;
+      return <RowGroup name={row.name} {...row.__metaData} row={props.row} idx={props.idx} handleDragEnd={props.handleDragEnd} handleDragStart={props.handleDragStart} cellMetaData={this.props.cellMetaData} renderer={this.props.rowGroupRenderer}/>;
     }
     if (this.state.scrollingTimeout !== null) {
       // in the midst of a rapid scroll, so we render placeholders
@@ -322,6 +324,8 @@ const Canvas = React.createClass({
           key: displayStart + idx,
           ref: idx,
           idx: displayStart + idx,
+          handleDragStart: this.props.handleDragStart,
+          handleDragEnd: this.props.handleDragEnd,
           row: r.row,
           height: rowHeight,
           onMouseOver: this.onMouseOver,
