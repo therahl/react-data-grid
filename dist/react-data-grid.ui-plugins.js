@@ -8683,6 +8683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  CustomDragLayer.prototype.renderDraggedRows = function renderDraggedRows() {
 	    var _this2 = this;
 
+	    // @NOTE Lennd: pass columns to renderDraggedCells
 	    var columns = this.props.columns;
 	    return this.getDraggedRows().map(function (r, i) {
 	      return _react2['default'].createElement(
@@ -8696,6 +8697,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  CustomDragLayer.prototype.renderDraggedCells = function renderDraggedCells(item, rowIdx, columns) {
 	    var cells = [];
 	    if (item != null) {
+	      // @NOTE Lennd: Iterate over columns and use formatter when available
 	      columns.forEach(function (c) {
 	        if (item.hasOwnProperty(c.key)) {
 	          if (c.formatter) {
@@ -8703,7 +8705,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            cells.push(_react2['default'].createElement(
 	              'td',
 	              { key: 'dragged-cell-' + rowIdx + '-' + c.key, className: 'react-grid-Cell', style: { padding: '5px' } },
-	              _react2['default'].createElement(Formatter, { value: item[c.key] })
+	              _react2['default'].createElement(Formatter, { dependentValues: c.getRowMetaData(item, c), value: item[c.key] })
 	            ));
 	          } else {
 	            cells.push(_react2['default'].createElement(
